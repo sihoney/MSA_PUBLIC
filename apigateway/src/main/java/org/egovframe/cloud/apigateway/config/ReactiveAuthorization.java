@@ -60,7 +60,7 @@ public class ReactiveAuthorization implements ReactiveAuthorizationManager<Autho
 
     // org.egovframe.cloud.common.config.GlobalConstant 값도 같이 변경해주어야 한다.
 //    public static final String AUTHORIZATION_URI = "/member-service" + "/api/v1/authorizations/check";
-    public static final String AUTHORIZATION_URI = "/backend5-service" + "/api/authorizations/check";
+    public static final String AUTHORIZATION_URI = "/backend5-service" + "/api/v1/authorizations/check";
     public static final String REFRESH_TOKEN_URI = "/user-service" + "/api/v1/users/token/refresh";
 
     /**
@@ -72,8 +72,11 @@ public class ReactiveAuthorization implements ReactiveAuthorizationManager<Autho
      * @see WebFluxSecurityConfig
      */
     @Override
-    public Mono<AuthorizationDecision> check(Mono<Authentication> authentication,
-        AuthorizationContext context) {
+    public Mono<AuthorizationDecision> check(
+            Mono<Authentication> authentication,    // 😜 JWT 검증 후 생성된 사용자 정보
+            AuthorizationContext context    // 😜 현재 요청 정보
+    ) {
+        // 😜 1. 요청 정보 추출
         ServerHttpRequest request = context.getExchange().getRequest();
         RequestPath requestPath = request.getPath();
         HttpMethod httpMethod = request.getMethod();
@@ -85,6 +88,7 @@ public class ReactiveAuthorization implements ReactiveAuthorizationManager<Autho
 
         String authorizationHeader = "";
 
+        // 😜 2. 헤더에서 JWT 토큰 읽기
         List<String> authorizations =
             request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION) ?
                 request.getHeaders().get(HttpHeaders.AUTHORIZATION) : null;
@@ -95,7 +99,9 @@ public class ReactiveAuthorization implements ReactiveAuthorizationManager<Autho
         ) {
             try {
                 authorizationHeader = authorizations.get(0);
+                // 실제 JWT만 추출
                 String jwt = authorizationHeader.replace("Bearer ", "");
+                // 😜 3. JWT 검증
                 String subject = Jwts.parser()
                                 .verifyWith(loadPublicKey(TOKEN_PUBLIC))
                                 .build().parseSignedClaims(jwt).getPayload().getSubject();
@@ -125,12 +131,14 @@ public class ReactiveAuthorization implements ReactiveAuthorizationManager<Autho
         boolean granted = false;
         try {
             String token = authorizationHeader; // Variable used in lambda expression should be final or effectively final
+            // 4. 😜 인가 체크 API 호출 (gateway는 권한을 직접 판단 X, 서비스에 질문)
             Mono<Boolean> body = WebClient.create(baseUrl)
                 .get()
                 .headers(httpHeaders -> {
                     httpHeaders.add(HttpHeaders.AUTHORIZATION, token);
                 })
                 .retrieve().bodyToMono(Boolean.class);
+            // 인가 체크 API 호출 결과
             granted = body.toFuture().get().booleanValue();
             log.info("Security AuthorizationDecision granted={}", granted);
         } catch (Exception e) {
@@ -138,6 +146,7 @@ public class ReactiveAuthorization implements ReactiveAuthorizationManager<Autho
 //            return Mono.just(new AuthorizationDecision(true));
             throw new AuthorizationServiceException("인가 요청시 오류 발생");
         }
+        // 😜 5. Gateway 최종 판단 (true -> 서비스 호출/false -> 403)
         return Mono.just(new AuthorizationDecision(granted));
     }
 
