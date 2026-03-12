@@ -8,5 +8,7 @@ on:
     build:
       name: "build apigateway"
       runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+      steps:
+        - name:
+          uses: actions/checkout@v4
+

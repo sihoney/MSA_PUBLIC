@@ -1,4 +1,4 @@
-# ./github/workflows/image-registry-cicd
+# ./github/workflows/image-registry-cicd.yml
 
 이 파일은 
 
@@ -24,7 +24,14 @@ name: image-registry-cicd
 ```
 
 이건 workflow 이름이야.
-GitHub Actions 탭에서 이 작업이 `image-registry-cicd`라는 이름으로 보인다. 즉 “이미지 레지스트리용 CI/CD”라는 뜻인데, 실제로는 지금 단계에선 **registry push 중심의 CI**라고 보는 게 더 정확하다. ([GitHub][1])
+
+GitHub Actions 탭에서 이 작업이 `image-registry-cicd`라는 이름으로 보인다. 
+
+즉 “이미지 레지스트리용 CI/CD”라는 뜻인데, 
+
+실제로는 지금 단계에선 **registry push 중심의 CI**라고 보는 게 더 정확하다. ([GitHub][1])
+
+---
 
 ```yaml
 on:
@@ -48,7 +55,7 @@ on:
       - "config/**"
       - "discovery/**"
       - "apigateway/**"
-      - ".github/workflows/image-registry-cicd.yml"
+      - ".github/workflows/apigateway-registry.yml"
 ```
 
 이건 꽤 중요하다.
