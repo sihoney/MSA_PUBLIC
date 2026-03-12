@@ -1,6 +1,6 @@
 # Self-hosted Runner 정리
 
-이 문서는 GitHub Actions의 self-hosted runner를 어떻게 붙이는지 정리한 문서입니다.
+이 문서는 **GitHub Actions의 self-hosted runner**를 어떻게 붙이는지 정리한 문서입니다.
 
 ## 1. self-hosted runner가 뭔가
 
@@ -12,7 +12,7 @@ self-hosted runner는 반대로:
 - 사내 서버
 - 개인 서버
 
-이런 내가 가진 장비 안에서 GitHub Actions 작업을 실행하는 방식입니다.
+이런 **내가 가진 장비 안에서 GitHub Actions 작업을 실행**하는 방식입니다.
 
 즉:
 
