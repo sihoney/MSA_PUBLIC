@@ -48,7 +48,11 @@ on:
 * `push`: 코드가 push되면 자동 실행
 * `branches: main, master`: 아무 브랜치나 아니고 `main` 또는 `master`에 push될 때만 동작
 
-즉, 수업에서 여기서 배우는 포인트는 **“자동화가 어떤 이벤트에 반응하는가”**야. CI/CD는 항상 “무슨 조건에서 시작되는가”부터 본다. ([GitHub][1])
+즉, 수업에서 여기서 배우는 포인트는 **“자동화가 어떤 이벤트에 반응하는가”**야. 
+
+CI/CD는 항상 “무슨 조건에서 시작되는가”부터 본다. ([GitHub][1])
+
+---
 
 ```yaml
     paths:
@@ -59,7 +63,10 @@ on:
 ```
 
 이건 꽤 중요하다.
-`main`에 push했다고 해서 매번 실행하지 않고, **특정 경로가 바뀌었을 때만 실행**하게 제한한 거야.
+
+`main`에 push했다고 해서 매번 실행하지 않고, 
+
+**특정 경로가 바뀌었을 때만 실행**하게 제한한 거야.
 
 예를 들어:
 
@@ -69,7 +76,12 @@ on:
 * workflow 파일 자체 수정 → 실행
 
 반대로 README만 바꿨다면 굳이 이미지 빌드를 다시 안 할 수 있다.
-즉, **불필요한 빌드를 줄여 비용과 시간을 아끼는 설정**이야. 수업에서 이 부분은 “왜 paths 필터를 거는가?”로 자주 나온다. ([GitHub][1])
+
+즉, **불필요한 빌드를 줄여 비용과 시간을 아끼는 설정**이야. 
+
+수업에서 이 부분은 “왜 paths 필터를 거는가?”로 자주 나온다. ([GitHub][1])
+
+---
 
 ```yaml
 concurrency:
@@ -85,7 +97,10 @@ concurrency:
 * 가장 최신 코드 기준 빌드만 남김
 
 이렇게 해야 낡은 커밋 기준 이미지가 올라가는 걸 줄일 수 있어.
+
 즉, **“최신 push 기준으로만 작업 유지”**라고 이해하면 된다. ([GitHub][1])
+
+---
 
 ```yaml
 permissions:
@@ -99,7 +114,14 @@ permissions:
 * `packages: write` → GHCR에 이미지 push 하려면 필요
 
 여기서 수업 포인트는 **“Actions도 권한이 있어야 뭘 할 수 있다”**는 점이야.
-그냥 workflow만 작성한다고 push가 되는 게 아니라, 패키지 레지스트리에 쓸 권한도 열어줘야 한다. 문서에서도 GHCR push에 `packages: write`가 필요하다고 정리한다. ([GitHub][1])
+
+그냥 workflow만 작성한다고 push가 되는 게 아니라, 
+
+패키지 레지스트리에 쓸 권한도 열어줘야 한다. 
+
+문서에서도 GHCR push에 `packages: write`가 필요하다고 정리한다. ([GitHub][1])
+
+---
 
 ```yaml
 jobs:
@@ -115,6 +137,8 @@ jobs:
 * `runs-on: ubuntu-latest`: GitHub가 제공하는 우분투 러너에서 실행
 
 즉, 네 로컬 PC가 아니라 **GitHub의 리눅스 실행 환경**에서 빌드가 돌아가는 구조다. ([GitHub][1])
+
+---
 
 ```yaml
     strategy:
@@ -133,6 +157,7 @@ jobs:
 ```
 
 여기가 핵심 중 핵심이다.
+
 이건 **matrix 전략**이야. 같은 작업 구조를 3개 서비스에 반복 적용하는 방식이다.
 
 즉, 이 workflow는 사실상 아래 3개를 돌린다.
@@ -142,8 +167,12 @@ jobs:
 * apigateway 이미지 빌드/푸시
 
 `fail-fast: false`는 한 모듈이 실패해도 나머지 모듈은 계속 돌게 하겠다는 뜻이야.
+
 예를 들어 `config` 빌드 실패해도 `discovery`, `apigateway`는 계속 시도한다.
+
 수업에서는 이걸 통해 **“중복되는 workflow 코드를 줄이는 법”**을 배울 가능성이 크다. ([GitHub][1])
+
+---
 
 ```yaml
 steps:
@@ -152,7 +181,12 @@ steps:
 ```
 
 이건 러너에 **현재 Git 저장소 코드를 내려받는 단계**야.
-이게 없으면 빌드할 파일, Dockerfile, Gradle wrapper, 스크립트가 없어서 다음 단계가 전부 실패한다. ([GitHub][1])
+
+이게 없으면 빌드할 파일, Dockerfile, Gradle wrapper, 스크립트가 없어서 
+
+다음 단계가 전부 실패한다. ([GitHub][1])
+
+---
 
 ```yaml
   - name: JDK 설정
@@ -170,7 +204,12 @@ steps:
 * `cache: gradle`로 Gradle 의존성 캐시 활용
 
 이 저장소 문서도 workflow가 **JDK 17 설정 후 각 모듈 jar를 빌드한다**고 설명한다.
-즉, 수업에서는 여기서 **“CI 러너는 매번 깨끗한 환경이므로, 필요한 런타임부터 설치해야 한다”**는 걸 이해하면 된다. ([GitHub][1])
+
+즉, 수업에서는 여기서 **“CI 러너는 매번 깨끗한 환경이므로, 
+
+필요한 런타임부터 설치해야 한다”**는 걸 이해하면 된다. ([GitHub][1])
+
+---
 
 ```yaml
   - name: 이미지 경로 값 준비
@@ -203,6 +242,8 @@ steps:
 여기서 특히 네가 이해해야 할 건 `GITHUB_ENV`야.
 이 파일에 `echo`로 값을 넣으면, **뒤에 오는 step들에서 공통 환경변수처럼 재사용**할 수 있다. 즉 이 단계는 “값 계산만 해두고, 뒤에서 쓰게 만드는 준비 단계”다. ([GitHub][1])
 
+---
+
 ```yaml
   - name: GHCR 로그인
     uses: docker/login-action@v3
@@ -218,8 +259,14 @@ steps:
 * `username: github.actor` → 현재 실행 주체 계정
 * `password: secrets.GITHUB_TOKEN` → GitHub가 기본 제공하는 토큰
 
-문서에도 이 workflow 기준으로는 별도 `REGISTRY_USERNAME`, `REGISTRY_PASSWORD` 없이 **기본 `GITHUB_TOKEN`으로 push 가능**하다고 적혀 있다.
-즉, 수업 포인트는 **“모든 비밀번호를 직접 넣는 게 아니라 GitHub 기본 토큰과 권한으로 처리할 수 있다”**는 점이야. ([GitHub][1])
+문서에도 이 workflow 기준으로는 별도 `REGISTRY_USERNAME`, `REGISTRY_PASSWORD` 없이
+**기본 `GITHUB_TOKEN`으로 push 가능**하다고 적혀 있다.
+
+즉, 수업 포인트는 **“모든 비밀번호를 직접 넣는 게 아니라 
+
+GitHub 기본 토큰과 권한으로 처리할 수 있다”**는 점이야. ([GitHub][1])
+
+---
 
 ```yaml
   - name: 이미지 빌드 및 푸시
@@ -258,8 +305,12 @@ steps:
 * `LOAD_TO_MINIKUBE: "false"` → minikube에는 싣지 않음
 
 이게 중요하다.
+
 즉 이 workflow는 **클라우드 레지스트리 push용**이지, **로컬 minikube 적재용은 아니다**.
-문서도 현재 구조를 “Docker 이미지 생성 후 GHCR push”로 설명하고 있고, 서버 배포나 Kubernetes 반영은 나중 단계라고 분리해 둔다. ([GitHub][1])
+
+문서도 현재 구조를 “Docker 이미지 생성 후 GHCR push”로 설명하고 있고, 
+
+서버 배포나 Kubernetes 반영은 나중 단계라고 분리해 둔다. ([GitHub][1])
 
 그리고 `run:` 안에서 실제 하는 일은 딱 두 단계다.
 
@@ -274,6 +325,8 @@ steps:
 
 문서도 이 저장소의 CI 단계가 **각 모듈의 `scripts/build_jar.sh`, `scripts/build_docker.sh`를 재사용한다**고 적고 있다. ([GitHub][1])
 
+---
+
 ```yaml
   - name: 결과 출력
     shell: bash
@@ -287,12 +340,25 @@ steps:
 `완료 이미지: ghcr.io/owner/apigateway:a1b2c3d`
 
 실제 배포는 안 하지만,
+
 적어도 **“어떤 이미지가 어떤 태그로 올라갔는지”** 확인할 수 있게 해 준다.
-나중에 CD를 붙일 때는 바로 이 태그를 써서 `docker pull` 하거나 `kubectl set image` 같은 데 연결할 수 있다. 문서도 현재는 여기까지가 CI이고, 서버가 생기면 그 다음 단계로 배포를 붙인다고 설명한다. ([GitHub][1])
+
+나중에 CD를 붙일 때는 바로 이 태그를 써서 
+
+`docker pull` 하거나 `kubectl set image` 같은 데 연결할 수 있다. 
+
+문서도 현재는 여기까지가 CI이고, 서버가 생기면 그 다음 단계로 배포를 붙인다고 설명한다. ([GitHub][1])
+
+---
 
 이 workflow를 한 줄 요약하면 이거다.
 
-**`main/master에 관련 서비스 코드가 push되면 → GitHub Actions가 각 서비스 jar를 빌드하고 → Docker 이미지를 만들고 → GHCR에 push한다.`** ([GitHub][1])
+**`main/master에 관련 서비스 코드가 push되면
+→ GitHub Actions가 각 서비스 jar를 빌드하고 
+→ Docker 이미지를 만들고 
+→ GHCR에 push한다.`** ([GitHub][1])
+
+---
 
 수업에서 특히 봐야 할 포인트만 다시 압축하면:
 
@@ -322,6 +388,8 @@ steps:
 
 9. `PUSH_IMAGE=true`, `LOAD_TO_MINIKUBE=false`
    → 이 workflow가 “GHCR push용”이라는 점
+
+---
 
 네가 지금 이걸 공부할 때 제일 좋은 순서는:
 **이 workflow 읽기 → 각 모듈의 `scripts/build_jar.sh` 확인 → `scripts/build_docker.sh` 확인**이야.
