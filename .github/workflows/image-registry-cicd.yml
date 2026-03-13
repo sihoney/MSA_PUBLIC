@@ -91,26 +91,42 @@ jobs:
       # PUSH_IMAGE=true 이므로 build_docker.sh 내부에서 docker push까지 같이 수행된다.
       # LOAD_TO_MINIKUBE는 로컬 minikube용 옵션이라
       # GitHub Actions에서는 false로 꺼 두는 것이 맞다.
-      - name: 이미지 빌드 및 푸시
-        shell: bash
-        # matrix에 들어 있는 module_dir로 이동하면
-        # 각 서비스 폴더 안의 scripts/build_jar.sh, scripts/build_docker.sh를 그대로 재사용할 수 있다.
-        working-directory: ${{ matrix.module_dir }}
-        env:
-          # 최종 이미지 경로 예:
-          # ghcr.io/parkjinwoo/config:a1b2c3d
-          IMAGE_REGISTRY: ${{ env.IMAGE_REGISTRY }}
-          IMAGE_NAME: ${{ matrix.image_name }}
-          IMAGE_TAG: ${{ env.IMAGE_TAG }}
-          # true로 두면 build_docker.sh 내부에서 docker push를 실행한다.
-          PUSH_IMAGE: "true"
-          # GitHub Actions는 minikube에 적재할 필요가 없으므로 false로 둔다.
-          LOAD_TO_MINIKUBE: "false"
+      - name: Prepare image URI # 레지스트리 경로와 태그 조합
+        id: prepare-image
         run: |
-          # 실행 가능한 jar를 먼저 만든다.
-          ./scripts/build_jar.sh
-          # 방금 만든 jar를 포함한 Docker 이미지를 만들고 GHCR로 올린다.
-          ./scripts/build_docker.sh
+          IMAGE_PATH="${REGISTRY}/$(echo "${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')"
+          echo "image=${IMAGE_PATH}:${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          echo "latest=${IMAGE_PATH}:latest" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push image # Dockerfile 기반 이미지 빌드 및 푸시
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.prepare-image.outputs.image }}
+            ${{ steps.prepare-image.outputs.latest }}
+          platforms: linux/amd64,linux/arm64
+#      - name: 이미지 빌드 및 푸시
+#        shell: bash
+#        # matrix에 들어 있는 module_dir로 이동하면
+#        # 각 서비스 폴더 안의 scripts/build_jar.sh, scripts/build_docker.sh를 그대로 재사용할 수 있다.
+#        working-directory: ${{ matrix.module_dir }}
+#        env:
+#          # 최종 이미지 경로 예:
+#          # ghcr.io/parkjinwoo/config:a1b2c3d
+#          IMAGE_REGISTRY: ${{ env.IMAGE_REGISTRY }}
+#          IMAGE_NAME: ${{ matrix.image_name }}
+#          IMAGE_TAG: ${{ env.IMAGE_TAG }}
+#          # true로 두면 build_docker.sh 내부에서 docker push를 실행한다.
+#          PUSH_IMAGE: "true"
+#          # GitHub Actions는 minikube에 적재할 필요가 없으므로 false로 둔다.
+#          LOAD_TO_MINIKUBE: "false"
+#        run: |
+#          # 실행 가능한 jar를 먼저 만든다.
+#          ./scripts/build_jar.sh
+#          # 방금 만든 jar를 포함한 Docker 이미지를 만들고 GHCR로 올린다.
+#          ./scripts/build_docker.sh
 
       # Actions 화면에서 어떤 이미지가 올라갔는지 바로 보이게 마지막에 출력한다.
       # 실제 배포는 하지 않지만, 이 출력만으로도 다음 단계에서 어떤 태그를 써야 할지 확인할 수 있다.

@@ -20,28 +20,28 @@
         <property name="app_name" value="${app_name:-apigateway}" />
 
         <!-- ELK - Logstash 로 로그를 전송하기 위한 appender -->
-        <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-            <destination>${destination}</destination>
-            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-                <providers>
-                    <mdc/>
-                    <context/>
-                    <logLevel/>
-                    <loggerName/>
-                    <pattern>
-                        <pattern>
-                            {"appName": "${app_name}"}
-                        </pattern>
-                    </pattern>
-                    <threadName/>
-                    <message/>
-                    <logstashMarkers/>
-                    <stackTrace/>
-                </providers>
-            </encoder>
-        </appender>
+<!--        <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">-->
+<!--            <destination>${destination}</destination>-->
+<!--            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">-->
+<!--                <providers>-->
+<!--                    <mdc/>-->
+<!--                    <context/>-->
+<!--                    <logLevel/>-->
+<!--                    <loggerName/>-->
+<!--                    <pattern>-->
+<!--                        <pattern>-->
+<!--                            {"appName": "${app_name}"}-->
+<!--                        </pattern>-->
+<!--                    </pattern>-->
+<!--                    <threadName/>-->
+<!--                    <message/>-->
+<!--                    <logstashMarkers/>-->
+<!--                    <stackTrace/>-->
+<!--                </providers>-->
+<!--            </encoder>-->
+<!--        </appender>-->
         <root level="WARN">
-            <appender-ref ref="LOGSTASH" />
+<!--            <appender-ref ref="LOGSTASH" />-->
             <appender-ref ref="STDOUT" />
         </root>
     </springProfile>
