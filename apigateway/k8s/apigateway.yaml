@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: apigateway
-          image: apigateway:dev # 1.0.0
+          image: apigateway:dev
           imagePullPolicy: IfNotPresent
           env:
             - name: SPRING_PROFILES_ACTIVE
@@ -46,6 +46,8 @@ spec:
               value: http://config-service:8888
             - name: SERVER_PORT
               value: "8000"
+            - name: TOKEN_SECRET
+              value: "token_secret"
           ports:
             - containerPort: 8000
           readinessProbe:

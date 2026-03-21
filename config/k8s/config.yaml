@@ -39,7 +39,7 @@ spec:
             optional: false
       containers:
         - name: config-service
-          image: config:1.0.0
+          image: config:dev
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8888
