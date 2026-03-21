@@ -94,7 +94,7 @@ jobs:
       - name: Prepare image URI # 레지스트리 경로와 태그 조합
         id: prepare-image
         run: |
-          IMAGE_PATH="${REGISTRY}/$(echo "${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')"
+          IMAGE_PATH="${IMAGE_REGISTRY}/$(echo "${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')"
           echo "image=${IMAGE_PATH}:${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
           echo "latest=${IMAGE_PATH}:latest" >> "$GITHUB_OUTPUT"
 
