@@ -8,7 +8,8 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main-gateway
+      - my_practice_apigateway
+#      - main-gateway
     paths:
       - "apigateway/**"
       - ".github/workflows/apigateway-registry.yml"
